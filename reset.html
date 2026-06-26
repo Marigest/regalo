@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Reset Salvataggi</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(180deg,#FFF9FB,#FFF0F8);font-family:Lato,system-ui,sans-serif}
+  .box{background:white;padding:2rem;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.08);max-width:640px;width:92%}
+  h1{font-family:'Playfair Display',serif;margin:0 0 0.6rem}
+  p{color:#6b516d}
+  .keys{margin:1rem 0;padding:0.8rem;background:#f6f3f8;border-radius:8px}
+  .btn{display:inline-block;padding:0.7rem 1.2rem;border-radius:10px;text-decoration:none;color:white;background:linear-gradient(90deg,#ff9ac8,#cfa0ff);cursor:pointer;border:0}
+  .btn-muted{background:transparent;color:#6b516d;border:1px solid #eee;margin-left:0.6rem}
+  .result{margin-top:1rem;color:green}
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>Reset dei salvataggi</h1>
+    <p>Questa pagina rimuoverà i dati salvati localmente usati dall'app (contatori, quiz, capsula, ecc.).</p>
+    <div class="keys">
+      <strong>Chiavi rimosse:</strong>
+      <ul>
+        <li>countdown_reached</li>
+        <li>opened_cards</li>
+        <li>flipped_tiles</li>
+        <li>quiz_viaggio</li>
+        <li>quiz_viaggio_partial</li>
+        <li>capsula_items</li>
+      </ul>
+    </div>
+    <div>
+      <button id="doReset" class="btn">Reset Salvataggi</button>
+      <button id="doClear" class="btn btn-muted">Cancella tutto il localStorage</button>
+      <a href="index.html" class="btn btn-muted" style="margin-left:0.8rem;">Torna all'home</a>
+    </div>
+    <div id="result" class="result" aria-live="polite"></div>
+  </div>
+<script>
+  const result = document.getElementById('result');
+  document.getElementById('doReset').addEventListener('click', () => {
+    const keys = ['countdown_reached','opened_cards','flipped_tiles','quiz_viaggio','quiz_viaggio_partial','capsula_items'];
+    keys.forEach(k => localStorage.removeItem(k));
+    result.textContent = 'Dati resettati: ' + keys.join(', ');
+  });
+  document.getElementById('doClear').addEventListener('click', () => {
+    if (!confirm('Sicuro di voler cancellare TUTTO il localStorage?')) return;
+    localStorage.clear();
+    result.textContent = 'Tutto il localStorage è stato cancellato.';
+  });
+</script>
+</body>
+</html>

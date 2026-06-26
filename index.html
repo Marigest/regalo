@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>💕 Il tuo regalo ti aspetta...</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body {
+    background: linear-gradient(160deg, #FFF0F5 0%, #F0E8FF 55%, #FFF8E8 100%);
+    min-height: 100vh;
+  }
+
+  .page { gap: 0; }
+
+  /* Cuore */
+  .heart {
+    font-size: 3.8rem;
+    animation: heartbeat 1.4s ease-in-out infinite;
+    margin-bottom: 1.4rem;
+  }
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    14%     { transform: scale(1.2); }
+    28%     { transform: scale(1); }
+    42%     { transform: scale(1.12); }
+  }
+
+  .countdown-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 700; color: var(--text);
+    line-height: 1.25; margin-bottom: 0.6rem;
+  }
+  .countdown-title span { color: var(--lilac-dark); }
+
+  .countdown-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem;
+    color: var(--text-soft); margin-bottom: 2.5rem;
+  }
+
+  /* Griglia numeri */
+  .countdown-grid {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    justify-content: center; margin-bottom: 2rem;
+  }
+  .countdown-box {
+    background: var(--white);
+    border-radius: 22px;
+    padding: 1.3rem 1.6rem;
+    min-width: 92px;
+    box-shadow: 0 8px 30px var(--shadow);
+    border: 2px solid var(--rose);
+  }
+  .countdown-box .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 700;
+    color: var(--lilac-dark); line-height: 1;
+    display: block;
+  }
+  .countdown-box .label {
+    font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--text-soft);
+    margin-top: 0.35rem; display: block;
+  }
+
+  .birthday-msg {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem;
+    color: var(--text-soft); margin-bottom: 1.8rem;
+    min-height: 1.4em;
+  }
+
+  /* Bottone — invisibile finché JS non lo accende */
+  #btn-open {
+    display: none;            /* JS cambierà in inline-flex */
+    align-items: center; gap: 0.5rem;
+    background: linear-gradient(135deg, var(--rose-dark), var(--lilac-dark));
+    color: var(--white); border: none;
+    border-radius: 50px; padding: 1.15rem 2.6rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-style: italic;
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 8px 32px rgba(169,143,212,0.5);
+    animation: pulse-btn 2s ease-in-out infinite;
+    transition: transform 0.2s;
+  }
+  #btn-open:hover { transform: scale(1.06); }
+  @keyframes pulse-btn {
+    0%,100% { box-shadow: 0 8px 32px rgba(169,143,212,0.45); }
+    50%     { box-shadow: 0 14px 46px rgba(169,143,212,0.75); }
+  }
+
+  @media (max-width: 480px) {
+    .countdown-grid { gap: 0.6rem; }
+    .countdown-box  { min-width: 70px; padding: 0.9rem 0.8rem; }
+    .countdown-box .num { font-size: 2.2rem; }
+  }
+</style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+  <div class="heart">💕</div>
+  <h1 class="countdown-title">Manca pochissimo al tuo<br><span>21° compleanno</span></h1>
+  <p class="countdown-subtitle">Un conto alla rovescia fatto con tutto il cuore</p>
+
+  <div class="countdown-grid">
+    <div class="countdown-box"><span class="num" id="cd-days">00</span><span class="label">Giorni</span></div>
+    <div class="countdown-box"><span class="num" id="cd-hours">00</span><span class="label">Ore</span></div>
+    <div class="countdown-box"><span class="num" id="cd-mins">00</span><span class="label">Minuti</span></div>
+    <div class="countdown-box"><span class="num" id="cd-secs">00</span><span class="label">Secondi</span></div>
+  </div>
+
+  <p class="birthday-msg" id="birthday-msg">Il tuo regalo ti aspetta...</p>
+
+  <a id="btn-open" href="dashboard.html">Apri il tuo regalo, amore mio! 🎁</a>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  // ⚠️ MODIFICA LA DATA QUI (anno, mese 0-11, giorno, ora, minuti, secondi)
+  function getTarget() {
+    // Restituisce la data del compleanno per l'anno corrente.
+    // La logica che decide se terminare o riprogrammare è gestita altrove.
+    const now = new Date();
+    return new Date(now.getFullYear(), 5, 28, 0, 0, 0); // 28 Giugno a mezzanotte
+  }
+
+  const pad = n => String(n).padStart(2, '0');
+  function showButton() {
+    const btn = document.getElementById('btn-open');
+    btn.style.display = 'inline-flex'; // ← inline-flex, mai 'block'
+    // Assicuriamoci che il bottone riceva click e sia sopra eventuali overlay
+    btn.style.pointerEvents = 'auto';
+    btn.style.position = 'relative';
+    btn.style.zIndex = '2';
+    btn.setAttribute('tabindex', '0');
+    // Apri la dashboard in modalità 'gift' (prima tappa del flusso)
+    btn.href = 'dashboard.html?gift=1';
+
+    // Fallback visibile: se per qualche motivo il bottone rimane nascosto (overlay, CSS, ecc.),
+    // creiamo un bottone fisso in fondo allo schermo con z-index molto alto per i test.
+    setTimeout(() => {
+      try {
+        const rect = btn.getBoundingClientRect();
+        const style = window.getComputedStyle(btn);
+        if (rect.width === 0 || rect.height === 0 || style.visibility === 'hidden' || style.display === 'none') {
+            if (!document.getElementById('btn-open-fallback')) {
+            const fb = document.createElement('a');
+            fb.id = 'btn-open-fallback';
+            fb.href = btn.href || 'dashboard.html?gift=1';
+            fb.textContent = 'Apri il tuo regalo 🎁';
+            fb.className = 'btn-gold';
+            Object.assign(fb.style, {
+              position: 'fixed',
+              bottom: '22px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: '9999',
+              display: 'inline-flex',
+              padding: '0.9rem 1.8rem'
+            });
+            document.body.appendChild(fb);
+          }
+        }
+      } catch (e) { /* ignore in old browsers */ }
+    }, 120);
+  }
+
+  function endCountdown() {
+    // Imposta visuale a zero e mostra bottone, persistendo lo stato
+    document.getElementById('cd-days').textContent  = '00';
+    document.getElementById('cd-hours').textContent = '00';
+    document.getElementById('cd-mins').textContent  = '00';
+    document.getElementById('cd-secs').textContent  = '00';
+    document.getElementById('birthday-msg').textContent = '🎉 È arrivato il grande giorno!';
+    try { localStorage.setItem('countdown_reached', '1'); } catch (e) {}
+    showButton();
+    if (timerID) { clearInterval(timerID); timerID = null; }
+  }
+
+  let timerID;
+
+  function tick() {
+    const diff = getTarget() - Date.now();
+
+    if (diff <= 0) {
+      // Countdown arrivato a zero: usa endCountdown() per fermare tutto definitivamente
+      endCountdown();
+      return;
+    }
+
+    document.getElementById('cd-days').textContent  = pad(Math.floor(diff / 86400000));
+    document.getElementById('cd-hours').textContent = pad(Math.floor(diff % 86400000 / 3600000));
+    document.getElementById('cd-mins').textContent  = pad(Math.floor(diff % 3600000  / 60000));
+    document.getElementById('cd-secs').textContent  = pad(Math.floor(diff % 60000    / 1000));
+
+    if (diff < 3600000)
+      document.getElementById('birthday-msg').textContent = '✨ Ci siamo quasi...';
+  }
+
+  const initialDiff = getTarget() - Date.now();
+
+  // Se il target è ancora nel futuro, eliminiamo eventuale stato vecchio salvato in localStorage.
+  if (initialDiff > 0) {
+    try { localStorage.removeItem('countdown_reached'); } catch (e) {}
+  }
+
+  // Se è già stato raggiunto in passato, applica immediatamente lo stato di fine.
+  if (localStorage.getItem('countdown_reached') === '1' || initialDiff <= 0) {
+    endCountdown();
+  } else {
+    timerID = setInterval(tick, 1000);
+    tick(); // primo tick immediato senza aspettare 1 s
+  }
+
+  // Modalità test: se apri la pagina con ?test=1 mostro immediatamente il bottone
+  try {
+    if (new URLSearchParams(location.search).get('test') === '1') showButton();
+  } catch (e) {
+    /* noop in ambienti senza location */
+  }
+</script>
+</body>
+</html>

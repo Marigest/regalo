@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🎰 Il tuo vero regalo</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { background: linear-gradient(160deg, #FFF5E8 0%, #FFF0F5 100%); }
+  .page { gap: 2rem; }
+
+  .finale-emoji { font-size: 3.5rem; animation: wobble 2s ease-in-out infinite; }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-5deg); }
+    50%     { transform: rotate(5deg); }
+  }
+
+  .finale-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
+    font-weight: 700; color: var(--text);
+    max-width: 520px; line-height: 1.3;
+  }
+
+  .finale-msg {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem;
+    color: var(--text-soft);
+    max-width: 460px; line-height: 1.8;
+  }
+
+  /* Contenitore gratta e vinci */
+  .scratch-wrapper {
+    position: relative;
+    width: 340px; height: 170px;
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 10px 36px rgba(180,120,160,0.25);
+  }
+
+  /* Testo rivelato sotto la patina */
+  .scratch-reveal {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #FFF0F5, #F5F0FF);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem; border-radius: 22px; z-index: 1;
+    border: 2px solid var(--rose);
+  }
+  .scratch-reveal p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-style: italic;
+    color: var(--text); text-align: center; line-height: 1.6;
+  }
+
+  #scratch-canvas {
+    position: absolute; inset: 0;
+    z-index: 2; border-radius: 22px;
+    cursor: crosshair; touch-action: none;
+  }
+
+  .scratch-hint {
+    font-size: 0.82rem; color: var(--text-soft);
+    margin-top: 0.3rem; font-style: italic;
+  }
+
+  @media (max-width: 400px) {
+    .scratch-wrapper { width: 290px; height: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+  <div class="finale-emoji">🥹</div>
+
+  <h2 class="finale-title">Okay, ti devo una confessione...</h2>
+
+  <p class="finale-msg">
+    È molto corto lo so, ma avevo pochissimo tempo<br>
+    e mi è venuto tutto all'ultimo...<br>
+    Però non potevo lasciarti a mani vuote oggi! 🙈<br><br>
+    Gratta qui sotto per scoprire l'indizio sul tuo vero regalo:
+  </p>
+
+  <div class="scratch-wrapper">
+    <div class="scratch-reveal">
+      <!-- ⚠️ MODIFICA QUI con il vero indizio del regalo -->
+      <p>✈️ <strong>Il tuo vero regalo?</strong><br>
+        Spoiler: non c'è. Cioè, c'è ma devo ancora ordinarlo, sta prendendo polvere nel carrello. Meno curiosità e più pazienza, grazie! 🛒🤷‍♂️<br>
+        
+      </p>
+    </div>
+    <canvas id="scratch-canvas"></canvas>
+  </div>
+
+  <p class="scratch-hint">☝️ Gratta con il dito o il mouse per scoprire!</p>
+
+  <a href="dashboard.html" class="btn-outline">← Torna alle sorprese</a>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  (function initScratch() {
+    const canvas  = document.getElementById('scratch-canvas');
+    const wrapper = canvas.parentElement;
+    canvas.width  = wrapper.offsetWidth;
+    canvas.height = wrapper.offsetHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Patina argentata con gradiente
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0,   '#C8C8C8');
+    grad.addColorStop(0.3, '#E8E8E8');
+    grad.addColorStop(0.6, '#B0B0B0');
+    grad.addColorStop(1,   '#D4D4D4');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Testo sulla patina
+    ctx.fillStyle = 'rgba(80,80,80,0.4)';
+    ctx.font = 'bold 13px Lato, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦  GRATTA QUI  ✦', canvas.width / 2, canvas.height / 2 - 8);
+    ctx.fillText('per scoprire il tuo regalo', canvas.width / 2, canvas.height / 2 + 14);
+
+    // Modalità "cancella" per grattare
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth   = 44;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+
+    let drawing = false;
+
+    let revealed = 0;
+
+    function pos(e) {
+      const r = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return { x: src.clientX - r.left, y: src.clientY - r.top };
+    }
+    function checkReveal() {
+      const img = ctx.getImageData(0,0,canvas.width,canvas.height);
+      let cnt = 0;
+      for (let i=3;i<img.data.length;i+=4) if (img.data[i] < 250) cnt++;
+      const pct = (cnt / (canvas.width*canvas.height)) * 100;
+      if (pct > 6 && !revealed) {
+        revealed = 1;
+        setTimeout(() => { document.getElementById('scratch-done').style.display = 'block'; }, 3000);
+      }
+    }
+
+    canvas.addEventListener('mousedown',  e => { drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+    canvas.addEventListener('mousemove',  e => { if (!drawing) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); checkReveal(); });
+    canvas.addEventListener('mouseup',    () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); checkReveal(); }, { passive: false });
+    canvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!drawing) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); checkReveal(); }, { passive: false });
+    canvas.addEventListener('touchend',   () => drawing = false);
+  })();
+
+  // Bottone che appare dopo il grattamento completo
+  const doneWrap = document.createElement('div');
+  doneWrap.id = 'scratch-done'; doneWrap.style.display = 'none'; doneWrap.style.marginTop = '1rem';
+  doneWrap.innerHTML = `<button id="celebrate-btn" class="btn-gold">🎉 Buon compleanno! Apri il regalo finale</button>`;
+  document.querySelector('.page').appendChild(doneWrap);
+  document.getElementById('celebrate-btn').addEventListener('click', () => {
+    // Vai direttamente alla pagina del regalo che mostra la tua foto
+    window.location.href = 'regalo.html';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>💕 Buon Compleanno Amore Mio!</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body {
+    background: linear-gradient(160deg, #FFF0F5 0%, #F5F0FF 100%);
+    min-height: 100vh;
+  }
+
+  .page {
+    justify-content: flex-start;
+    padding-top: 4rem;
+    padding-bottom: 5rem;
+    gap: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    margin-bottom: 0.8rem;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5.5vw, 3.2rem);
+    font-weight: 700; color: var(--text); line-height: 1.2;
+  }
+  .header h1 .accent { color: var(--lilac-dark); }
+  .header p {
+    color: var(--text-soft); font-size: 1rem;
+    font-style: italic; margin-top: 0.5rem;
+  }
+
+  /* ── GRIGLIA 2×2 ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1.2rem;
+    width: min(520px, 92vw);
+    margin-top: 2.4rem;
+  }
+
+  /* Variante celebrativa quando si arriva dal bottone regalo */
+  .page.celebrate { padding-top: 2rem; }
+  .page.celebrate .header h1 { transform: translateY(-6px); }
+  .page.celebrate .cards-grid { gap: 1.4rem; width: min(720px, 92vw); }
+  .page.celebrate .card { border-radius: 28px; min-height: 190px; }
+  .sparkle {
+    position: absolute; pointer-events: none; z-index: 0;
+    width: 14px; height: 14px; opacity: 0.9;
+    filter: drop-shadow(0 6px 14px rgba(169,143,212,0.25));
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 26px;
+    padding: 2rem 1.4rem 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 6px 22px var(--shadow);
+    border: 2.5px solid transparent;
+    position: relative; overflow: hidden;
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.5rem;
+    transition: transform 0.3s cubic-bezier(.2,.8,.3,1), box-shadow 0.3s, border-color 0.3s;
+    min-height: 170px;
+  }
+
+  /* Sfumatura leggera al hover */
+  .card::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: 24px;
+    background: linear-gradient(135deg, var(--rose), var(--lilac));
+    opacity: 0; transition: opacity 0.3s; z-index: 0;
+  }
+  .card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 16px 40px var(--shadow); }
+  .card:hover::before { opacity: 0.09; }
+
+  /* Card aperta */
+  .card.opened {
+    border-color: var(--lilac);
+    background: linear-gradient(145deg, #FDFAFF, var(--white));
+  }
+  /* rimosso segnalino visibile dopo click */
+
+  .card-check {
+    position: absolute; top: 12px; right: 14px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--lilac-dark); color: var(--white);
+    font-size: 0.7rem; display: flex; align-items: center;
+    justify-content: center; font-weight: 700; opacity: 0;
+    transition: opacity 0.3s; z-index: 2;
+    display: none !important;
+  }
+
+  .card-emoji {
+    font-size: 2.6rem; position: relative; z-index: 1;
+    transition: transform 0.3s;
+  }
+  .card:hover .card-emoji { transform: scale(1.15) rotate(-5deg); }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.98rem; font-weight: 600;
+    color: var(--text); position: relative; z-index: 1;
+    line-height: 1.3; text-align: center;
+  }
+  .card-desc {
+    font-size: 0.75rem; color: var(--text-soft);
+    position: relative; z-index: 1; text-align: center;
+    line-height: 1.4;
+  }
+
+  /* ── AREA INFERIORE ── */
+  .bottom-area {
+    margin-top: 2.2rem;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 1.2rem;
+  }
+
+  #hint-msg {
+    font-size: 0.88rem; color: var(--text-soft);
+    font-style: italic; min-height: 1.3em;
+    transition: color 0.4s;
+  }
+
+  #btn-finale {
+    display: none;
+  }
+
+  /* ── MODALE LETTERA ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(74,53,80,0.6);
+    backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    padding: 1.2rem;
+    animation: fadeIn 0.25s;
+  }
+  .modal-overlay.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--white);
+    border-radius: 28px;
+    max-width: 560px; width: 100%;
+    max-height: 88vh; overflow-y: auto;
+    padding: 2.6rem 2rem 2rem;
+    box-shadow: 0 24px 60px rgba(100,50,120,0.25);
+    position: relative;
+    animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal-close {
+    position: absolute; top: 1.2rem; right: 1.2rem;
+    background: var(--pearl); border: none;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-size: 1rem; cursor: pointer; color: var(--text);
+    transition: background 0.2s; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: var(--rose); }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+  .modal-sub {
+    font-size: 0.88rem; color: var(--text-soft);
+    font-style: italic; margin-bottom: 1.8rem;
+  }
+
+  /* Foglio lettera dentro la modale */
+  .lettera-paper {
+    background: linear-gradient(155deg, #FFFBF0, #FFF5F8);
+    border-radius: 18px; padding: 2.2rem 1.8rem;
+    border: 1px solid var(--rose);
+    text-align: left; position: relative;
+  }
+  .lettera-paper::before {
+    content: '💕'; position: absolute;
+    top: 1.2rem; right: 1.4rem;
+    font-size: 1.4rem; opacity: 0.4;
+  }
+  .lettera-paper .saluto {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; font-weight: 600;
+    font-style: italic; color: var(--lilac-dark);
+    display: block; margin-bottom: 1.2rem;
+  }
+  .lettera-paper p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 0.97rem;
+    color: var(--text); line-height: 1.9;
+    margin-bottom: 1rem;
+  }
+  .placeholder {
+    background: #FFFACD;
+    border-left: 3px solid var(--gold);
+    padding: 0.4rem 0.8rem;
+    border-radius: 0 8px 8px 0;
+    display: block; font-style: normal;
+    font-size: 0.82rem; color: #8A7040;
+    margin-bottom: 1rem;
+    font-family: 'Lato', sans-serif;
+  }
+  .lettera-divider {
+    border: none; border-top: 1px dashed var(--rose);
+    margin: 1rem 0; opacity: 0.5;
+  }
+  .lettera-paper .firma {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 600;
+    font-style: italic; color: var(--rose-dark);
+    text-align: right; margin-top: 1.8rem;
+  }
+
+  @media (max-width: 480px) {
+    .cards-grid { gap: 0.9rem; width: 96vw; }
+    .card { min-height: 145px; padding: 1.4rem 0.9rem; }
+    .card-emoji { font-size: 2.1rem; }
+    .card-title { font-size: 0.88rem; }
+    .card-desc  { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Buon compleanno<br><span class="accent">amore mio!!</span> 🎂</h1>
+    <p>Quattro sorprese tutte per te — aprile tutte, poi vedi cosa succede...</p>
+  </div>
+
+  <!-- 2×2 GRID -->
+  <div class="cards-grid">
+
+    <!-- Card 1 — 21 Cose -->
+    <a class="card" id="card-1" href="#" onclick="openPanel('21cose.html'); markCard(1); return false;">
+      <span class="card-check">✓</span>
+      <div class="card-emoji">✨</div>
+      <div class="card-title">21 Cose di Te</div>
+      <div class="card-desc">21 motivi per cui ti amo</div>
+    </a>
+
+    <!-- Card 2 — Quiz Viaggio -->
+    <a class="card" id="card-2" href="#" onclick="openPanel('quiz.html'); markCard(2); return false;">
+      <span class="card-check">✓</span>
+      <div class="card-emoji">✈️</div>
+      <div class="card-title">Il Nostro Prossimo Volo</div>
+      <div class="card-desc">Il quiz del viaggio dei sogni</div>
+    </a>
+
+    <!-- Card 3 — Capsula del Tempo -->
+    <a class="card" id="card-3" href="#" onclick="openPanel('capsula.html'); markCard(3); return false;">
+      <span class="card-check">✓</span>
+      <div class="card-emoji">🌸</div>
+      <div class="card-title">La Capsula del Tempo</div>
+      <div class="card-desc">Promesse prima dei 22 anni</div>
+    </a>
+
+    <!-- Card 4 — Lettera (apre modale, NON nuova pagina) -->
+    <div class="card" id="card-4" onclick="openPanel('lettera.html'); markCard(4)">
+      <span class="card-check">✓</span>
+      <div class="card-emoji">💌</div>
+      <div class="card-title">Apri solo se sei pronta...</div>
+      <div class="card-desc">Una lettera solo per te</div>
+    </div>
+
+  </div>
+
+  <!-- HINT + BOTTONE FINALE -->
+  <div class="bottom-area">
+    <p id="hint-msg">Apri tutte e 4 le sorprese per sbloccare il finale ✨</p>
+    <a id="btn-finale" class="btn-gold" href="finale.html">🎰 Scopri il tuo vero regalo!</a>
+  </div>
+
+</div>
+
+<!-- OVERLAY IFRAME PER CARICARE LE PAGINE INTERNAMENTE -->
+<div id="panel-overlay" style="display:none; position:fixed; inset:0; background:rgba(10,8,12,0.45); z-index:9999; align-items:center; justify-content:center; padding:1.2rem;">
+  <div style="max-width:980px; width:100%; height:86vh; background:transparent; position:relative;">
+    <button id="panel-close" class="modal-close" style="position:absolute; right:8px; top:8px; z-index:10001;">✕</button>
+    <iframe id="panel-iframe" src="" style="width:100%; height:100%; border-radius:14px; border:0; box-shadow:0 18px 60px rgba(0,0,0,0.35);"></iframe>
+  </div>
+</div>
+
+<!-- MODALE LETTERA -->
+<div class="modal-overlay" id="modal-lettera">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLettera()">✕</button>
+    <h2 class="modal-title">💌 Solo per te</h2>
+    <p class="modal-sub">Hai fatto bene ad aprirla fino in fondo</p>
+    <div class="lettera-paper">
+      <span class="saluto">Piccola mia,</span>
+
+      <h3 style="margin-top:0.4rem; margin-bottom:0.8rem;">Auguri per i tuoi 21 anni, amore mio! ❤️</h3>
+
+      <p>Oggi compi <strong>21 anni</strong>. Sì, lo so, fa impressione anche a me. Non potevo assolutamente non fermarmi un attimo per scriverti due righe, anche perché questo è un traguardo incredibile. Tra l'altro, diciamocelo, il <strong>21</strong> è visibilmente il miglior numero dell'universo... e non solo perché stai diventando una donna meravigliosa, ma soprattutto perché sono nato io il 21! Coincidenze? Io non credo. È chiaramente il destino che ha voluto ricordarti ogni giorno chi è la tua vera fortuna (cioè io, ovviamente).</p>
+
+      <p>Comunque, sappi che i 21 anni nel mondo aprono le porte a una serie di assurdità burocratiche senza precedenti. Se oggi fossimo all'estero, potresti festeggiare sfruttando i tuoi nuovi, importantissimi diritti da adulta:</p>
+
+      <ul style="margin-left:1rem; margin-bottom:0.8rem;">
+        <li><strong>A Mumbai (India):</strong> Festeggia, perché da oggi lo Stato indiano ti ritiene finalmente abbastanza matura da non affogare in un bicchiere di birra! Lì l'alcol è vietato fino ai 21 anni. Praticamente fino a ieri per loro eri una poppante, oggi sei una rispettabile bevitrice.</li>
+        <li><strong>In Bahrain:</strong> Se per caso ti avanzano due spiccioli, da oggi puoi legalmente registrare a tuo nome un’intera flotta di navi commerciali. Quindi, se il tuo sogno segreto era diventare un capitano corsaro o contrabbandare spezie nel Golfo Persico, sappi che la legge ora te lo permette.</li>
+        <li><strong>In Virginia (USA):</strong> Paese che vai, logica che trovi. Da oggi sei legalmente autorizzata a girare con una pistola vera e propria nascosta nella borsetta, però guai a te se provi a comprare una sigaretta elettronica, perché quella è considerata "roba pericolosa per i ragazzini".</li>
+        <li><strong>In Madagascar:</strong> Nelle zone più tradizionali, da oggi sei ufficialmente abbastanza "grande e saggia" da poter partecipare al Famadihana, il rito dove si tirano fuori le mummie degli antenati dalle tombe per farci un ballo insieme. Quindi, se i festeggiamenti classici dovessero sembrarti noiosi, abbiamo un'alternativa decisamente più movimentata e d'altri tempi.</li>
+      </ul>
+
+      <p>Insomma, il mondo è un posto assolutamente fuori di testa, e da oggi hai il passaporto ufficiale per essere totalmente matta anche tu.</p>
+
+      <p>Ma al di là dei pirati del Bahrain e dei balli con i defunti, la verità è un'altra. La verità è che la cosa più pazzesca di tutti questi anni non è stata scoprire le leggi bizzarre del mondo, ma guardare te. Vederti crescere giorno dopo giorno, un millimetro alla volta, è stato lo spettacolo più bello a cui potessi mai assistere.</p>
+
+      <p>Ti ho vista cambiare, evolverti, e fare passi da gigante sia nei tuoi pensieri che nel tuo modo di importi sul mondo. Sei passata dall'essere la ragazza di cui mi sono innamorato all'inizio, a diventare una donna incredibilmente determinata, fiera e intelligente. Hai una testa pazzesca e una maturità che spesso mi stupisce... anche se, ammettiamolo per onestà intellettuale, quando hai fame o quando le cose non vanno esattamente come avevi pianificato tu, tutta questa maturità svanisce nel nulla e l'età mentale ti crolla all'istante a 5 anni e mezzo. Ma a me piaci da morire proprio per questo contrasto continuo.</p>
+
+      <p>È incredibile come tu riesca ad affrontare le piccole e grandi sfide della vita con una grinta che mi lascia sempre senza fiato, per poi magari rischiare un infarto fulminante perché "oddio, ho perso il telefono!", cominciando a girare con il panico puro negli occhi, maledicendo i satelliti e la tecnologia... per poi scoprire che, cinque minuti prima, con una disinvoltura disarmante, lo avevi dato in custodia a me e ce l'ho io tranquillamente nella tasca dei pantaloni. Ormai è un classico della nostra commedia, e onestamente spero non cambierà mai.</p>
+
+      <p>Ogni giorno che passa ti vedo fare un passo in avanti: diventi più consapevole di chi sei, di quanto vali e di cosa meriti dalla vita. Eppure, nonostante tu stia crescendo così velocemente, la cosa che mi fa impazzire di te è che riesci a mantenere intatta quella dolcezza unica, quella purezza profonda e quel sorriso contagioso che ha il potere fisso e matematico di rincoglionirmi come se fosse il primo giorno in cui ti ho vista. Vedere come gestisci il tuo mondo, come ti prendi cura delle persone a cui vuoi bene, la lealtà che ci metti nei rapporti e il modo in cui insegui i tuoi obiettivi mi rende la persona più fiera del pianeta. Sei cresciuta tantissimo, amore mio, hai superato ostacoli e ti sei costruita la tua corazza, ma sei diventata una donna fantastica senza mai perdere la tua parte più vera, ironica e genuina. Stare al tuo fianco mentre diventi grande è un privilegio unico.</p>
+
+      <p>Il mio augurio per te, ora che hai 21 anni e che teoricamente per la legge del Bahrain potresti anche comandare una portaerei russa, è che tu possa esplorare questo mondo così folle senza mai perdere la tua luce, la tua ironia e soprattutto... che tu possa finalmente sviluppare un briciolo di quella pazienza che a te manca del tutto! Perché diciamoci la verità: qui l'unico con una pazienza infinita ed eroica sono io.</p>
+
+      <p>Ci vuole un autocontrollo da monaco buddista non solo per farti da portatelefono e cassaforte umana ufficiale, ma per sopravvivere a tutte le domande esistenziali e profondamente stupide che mi fai senza un briciolo di senso logico, per tutti i "CORNER!" che mi hai urlato contro o che mi hai mandato sotto forma di sticker molesti, e soprattutto per tutte le volte che, con una logica tutta tua che ancora devo decifrare, continui a chiamarmi "gay" nonostante stiamo felicemente insieme. Ti sopporto un sacco, sappilo, e questo è il mio più grande atto d'amore quotidiano. <em>(E per favore, non prenderla sul serio e non metterti a fare la finta offesa mentre leggi, sai benissimo che sto scherzando e che amo follemente ogni tua singola pazzia!)</em></p>
+
+      <p>Ti auguro di prenderti tutto ciò che desideri dalla vita, di non accontentarti mai e di non avere mai, per nessun motivo, paura di osare.</p>
+
+      <p>Ricordati che, ovunque deciderai di andare e qualsiasi cosa da matti deciderai di fare nel tuo futuro, io sarò sempre lì, esattamente un passo dietro di te, pronto a guardarti le spalle. Sarò la tua spalla sicuro quando sarai stanca, il tuo complice indiscusso nelle stupidaggini, la vittima preferita delle tue follie e il tuo fan numero uno, quello che urla più forte di tutti, in ogni singolo successo che otterrai.</p>
+
+      <p>Oggi si festeggia come meriti, mia splendida, esaurita e adorabile ventunenne. Buon compleanno, amore mio. Ti amo immensamente!</p>
+
+      <div class="firma">Per sempre tuo,<br>Mari&lt;3</div>
+    </div>
+  </div>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  // ── Stato card aperte ──
+  const opened = new Set(JSON.parse(localStorage.getItem('opened_cards') || '[]'));
+
+  // Se arriviamo dal bottone regalo, aggiungiamo una classe celebrativa
+  try {
+    if (new URLSearchParams(location.search).get('gift') === '1') document.querySelector('.page')?.classList.add('celebrate');
+  } catch (e) {}
+
+  function restoreCards() {
+    opened.forEach(n => document.getElementById('card-' + n)?.classList.add('opened'));
+    checkFinale();
+  }
+
+  function markCard(n) {
+    opened.add(n);
+    localStorage.setItem('opened_cards', JSON.stringify([...opened]));
+    document.getElementById('card-' + n)?.classList.add('opened');
+    checkFinale();
+    // lascia che il link <a> navighi normalmente
+  }
+
+  function checkFinale() {
+    if (opened.size >= 4) {
+      const btn = document.getElementById('btn-finale');
+      btn.style.display = 'inline-block';
+      document.getElementById('hint-msg').textContent = '🎉 Hai aperto tutto! Ecco il tuo vero regalo...';
+    }
+  }
+
+  // ── Modale lettera (card 4) ──
+  function openLettera() {
+    // segna la card come aperta
+    opened.add(4);
+    localStorage.setItem('opened_cards', JSON.stringify([...opened]));
+    document.getElementById('card-4').classList.add('opened');
+    checkFinale();
+    // apri la modale
+    document.getElementById('modal-lettera').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLettera() {
+    document.getElementById('modal-lettera').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Chiudi cliccando fuori
+  document.getElementById('modal-lettera').addEventListener('click', function(e) {
+    if (e.target === this) closeLettera();
+  });
+
+  restoreCards();
+
+  // Overlay iframe: apri file interno nella pagina (single-page)
+  function openPanel(src) {
+    const overlay = document.getElementById('panel-overlay');
+    const iframe = document.getElementById('panel-iframe');
+    if (!overlay || !iframe) return;
+    iframe.src = src;
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePanel() {
+    const overlay = document.getElementById('panel-overlay');
+    const iframe = document.getElementById('panel-iframe');
+    if (!overlay || !iframe) return;
+    overlay.style.display = 'none';
+    iframe.src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('panel-close').addEventListener('click', closePanel);
+  document.getElementById('panel-overlay').addEventListener('click', function(e){ if (e.target === this) closePanel(); });
+
+  // Quando l'iframe carica una pagina, intercettiamo i link interni che riportano alla dashboard
+  // e li trasformiamo in azioni di chiusura dell'overlay per evitare di caricare una "dashboard dentro la dashboard".
+  (function hookIframeLinks(){
+    const iframe = document.getElementById('panel-iframe');
+    iframe.addEventListener('load', () => {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc) return;
+        // Trova i link che sembrano tornare alla dashboard e intercetta il click
+        const anchors = doc.querySelectorAll('a[href]');
+        anchors.forEach(a => {
+          const href = a.getAttribute('href');
+          if (!href) return;
+          // se il link punta a dashboard.html o è un link 'torna indietro' (href='#' o contiene 'dashboard')
+          if (href.indexOf('dashboard') !== -1 || href === '#' || href === '' ) {
+            a.addEventListener('click', (ev) => { ev.preventDefault(); closePanel(); });
+          }
+        });
+      } catch (e) {
+        // cross-origin o errori occasionali: ignoriamo
+      }
+    });
+  })();
+</script>
+</body>
+</html>

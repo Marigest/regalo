@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🌸 La Capsula del Tempo</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { background: linear-gradient(160deg, #FFF5F8 0%, #F5F0FF 100%); }
+  .page {
+    justify-content: flex-start;
+    padding-top: 3rem; padding-bottom: 3.5rem; gap: 2rem;
+  }
+
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700; color: var(--text);
+  }
+  .page-header p { color: var(--text-soft); font-style: italic; margin-top: 0.4rem; }
+
+  /* Lista promesse */
+  .capsula-list {
+    display: flex; flex-direction: column;
+    gap: 1rem; max-width: 600px; width: 100%;
+  }
+
+  .capsula-item {
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: var(--white);
+    border-radius: 20px; padding: 1.2rem 1.4rem;
+    box-shadow: 0 4px 18px var(--shadow);
+    text-align: left;
+    transition: transform 0.2s;
+  }
+  .capsula-item:hover { transform: translateY(-3px); }
+
+  .capsula-icon { font-size: 1.8rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+  .capsula-text h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-weight: 600; color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+  .capsula-text p {
+    font-size: 0.85rem; color: var(--text-soft); line-height: 1.55;
+  }
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--rose), var(--lilac));
+    color: var(--white); font-size: 0.7rem; font-weight: 700;
+    border-radius: 20px; padding: 0.2rem 0.8rem; margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .capsula-actions { margin-left: auto; display: flex; gap: 0.5rem; align-items: center; }
+  .capsula-delete {
+    background: transparent; border: 0; color: #C04A6A; font-size: 0.95rem; cursor: pointer;
+    padding: 0.3rem 0.6rem; border-radius: 8px;
+  }
+  .capsula-delete:hover { background: rgba(192,74,106,0.06); }
+  .capsula-input-row input[type="text"] { padding:0.7rem; border-radius:12px; border:1px solid var(--pearl); }
+  .capsula-input-row input.emoji { width:72px; }
+  .capsula-input-row input.tag { width:140px; }
+
+  /* Sigillo finale */
+  .capsula-seal {
+    max-width: 600px; width: 100%;
+    background: linear-gradient(135deg, #FFF0F5, #F5F0FF);
+    border: 2px dashed var(--lilac);
+    border-radius: 20px; padding: 1.4rem 1.6rem;
+    text-align: center;
+  }
+  .capsula-seal p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 0.98rem;
+    color: var(--text-soft); line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+  <div class="page-header">
+    <h1>🌸 La Capsula del Tempo</h1>
+    <p>Sogni e promesse da realizzare prima dei tuoi 22 anni</p>
+  </div>
+
+  <div class="capsula-list">
+
+    <div class="capsula-item">
+      <div class="capsula-icon">🌍</div>
+      <div class="capsula-text">
+        <h4>Partire insieme senza pianificare nulla</h4>
+        <p>Una destinazione scelta all'ultimo, un biglietto comprato la sera prima. Solo noi.</p>
+        <span class="badge">Avventura</span>
+      </div>
+    </div>
+
+    <div class="capsula-item">
+      <div class="capsula-icon">🍽️</div>
+      <div class="capsula-text">
+        <h4>Cucinare una cena super elaborata insieme</h4>
+        <p>Un menù da 3 portate che non abbiamo mai cucinato — probabilmente andrà tutto storto ed è perfetto così.</p>
+        <span class="badge">Da fare insieme</span>
+      </div>
+    </div>
+
+    <div class="capsula-item">
+      <div class="capsula-icon">🌅</div>
+      <div class="capsula-text">
+        <h4>Vedere l'alba da qualche posto bellissimo</h4>
+        <p>Svegliarsi prima del sole, un thermos di caffè caldo e tu accanto.</p>
+        <span class="badge">Romantico</span>
+      </div>
+    </div>
+
+    <div class="capsula-item">
+      <div class="capsula-icon">🎬</div>
+      <div class="capsula-text">
+        <h4>Maratona di film che non abbiamo ancora visto</h4>
+        <p>Una lista di tutti i film che ci siamo sempre detti "lo vediamo" — una serata intera, coperte e popcorn.</p>
+        <span class="badge">Serata speciale</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="capsula-seal">
+    <p>"Queste non sono solo parole — sono impegni che prendo oggi,<br>il giorno del tuo 21° compleanno. 🌸"</p>
+  </div>
+
+  <a href="dashboard.html" class="btn-outline">← Torna alle sorprese</a>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  // Aggiungi obiettivi illimitati con salvataggio in localStorage
+  const listEl = document.querySelector('.capsula-list');
+  function renderList() {
+    const items = JSON.parse(localStorage.getItem('capsula_items') || '[]');
+    // rimuovi esistenti (tranne i nodi statici iniziali)
+    // semplifichiamo aggiungendo un'area di input in cima
+  }
+
+  // Creiamo un form dinamico in cima alla lista
+  (function init() {
+    const container = document.createElement('div');
+    container.style.maxWidth = '600px'; container.style.width = '100%';
+    container.style.marginBottom = '1rem';
+    container.innerHTML = `
+      <div class="capsula-input-row" style="display:flex; gap:0.6rem;">
+        <input id="capsula-emoji" class="emoji" placeholder="Emoji" title="Emoji" maxlength="2" style="padding:0.7rem; border-radius:12px; border:1px solid var(--pearl);">
+        <input id="capsula-tag" class="tag" placeholder="Tag (es. Avventura)" title="Tag" style="padding:0.7rem; border-radius:12px; border:1px solid var(--pearl);">
+        <input id="capsula-input" placeholder="Aggiungi un nuovo obiettivo..." style="flex:1; padding:0.7rem; border-radius:12px; border:1px solid var(--pearl);">
+        <button id="capsula-add" class="btn-primary" style="padding:0.6rem 1rem;">Aggiungi</button>
+      </div>
+    `;
+    listEl.parentElement.insertBefore(container, listEl);
+
+    function addItem(text, emoji, tag) {
+      if (!text || !text.trim()) return;
+      const items = JSON.parse(localStorage.getItem('capsula_items') || '[]');
+      const item = { id: Date.now() + '-' + Math.floor(Math.random()*1000), text: text.trim(), emoji: (emoji||'✨'), tag: (tag||''), ts: Date.now() };
+      items.push(item);
+      localStorage.setItem('capsula_items', JSON.stringify(items));
+      renderItems();
+    }
+
+    document.getElementById('capsula-add').addEventListener('click', () => {
+      const v = document.getElementById('capsula-input').value;
+      const e = document.getElementById('capsula-emoji').value;
+      const t = document.getElementById('capsula-tag').value;
+      addItem(v, e, t);
+      document.getElementById('capsula-input').value = '';
+      document.getElementById('capsula-emoji').value = '';
+      document.getElementById('capsula-tag').value = '';
+    });
+
+    document.getElementById('capsula-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('capsula-add').click(); } });
+
+    renderItems();
+  })();
+
+  function renderItems() {
+    const items = JSON.parse(localStorage.getItem('capsula_items') || '[]');
+    // rimuovi vecchi elementi dinamici
+    Array.from(listEl.querySelectorAll('.capsula-item.dynamic')).forEach(n => n.remove());
+    items.forEach(it => {
+      const el = document.createElement('div');
+      el.className = 'capsula-item dynamic';
+      el.innerHTML = `
+        <div class="capsula-icon">${escapeHtml(it.emoji || '✨')}</div>
+        <div class="capsula-text">
+          <h4>${escapeHtml(it.text)}</h4>
+          <p class="small">Aggiunto il ${new Date(it.ts).toLocaleString()}</p>
+          ${it.tag ? `<span class="badge">${escapeHtml(it.tag)}</span>` : ''}
+        </div>
+        <div class="capsula-actions">
+          <button class="capsula-delete" data-id="${escapeHtml(it.id)}">Elimina</button>
+        </div>
+      `;
+      listEl.appendChild(el);
+    });
+    // associa eventi di delete
+    Array.from(listEl.querySelectorAll('.capsula-delete')).forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        const id = btn.getAttribute('data-id');
+        const items = JSON.parse(localStorage.getItem('capsula_items') || '[]');
+        const filtered = items.filter(i => String(i.id) !== String(id));
+        localStorage.setItem('capsula_items', JSON.stringify(filtered));
+        renderItems();
+      });
+    });
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
+</script>
+</body>
+</html>

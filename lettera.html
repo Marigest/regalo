@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>💌 Solo per te</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { background: linear-gradient(160deg, #FFF8E8 0%, #FFF0F5 100%); }
+  .page {
+    justify-content: flex-start;
+    padding-top: 3rem; padding-bottom: 3.5rem; gap: 2rem;
+  }
+
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700; color: var(--text);
+  }
+  .page-header p { color: var(--text-soft); font-style: italic; margin-top: 0.4rem; }
+
+  /* Foglio della lettera */
+  .lettera-paper {
+    background: var(--white);
+    max-width: 580px; width: 100%;
+    border-radius: 24px;
+    padding: 2.8rem 2.4rem;
+    box-shadow: 0 10px 40px rgba(230,150,170,0.15);
+    border: 1px solid var(--rose);
+    position: relative;
+    text-align: left;
+  }
+
+  /* Decorazione angolo */
+  .lettera-paper::before {
+    content: '💕';
+    position: absolute; top: 1.4rem; right: 1.6rem;
+    font-size: 1.6rem; opacity: 0.5;
+  }
+
+  .lettera-paper .saluto {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 600; font-style: italic;
+    color: var(--lilac-dark); margin-bottom: 1.4rem;
+    display: block;
+  }
+
+  .lettera-paper p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 1rem;
+    color: var(--text); line-height: 1.9;
+    margin-bottom: 1.1rem;
+  }
+
+  /* Lista puntata con lo stesso carattere della lettera */
+  .lettera-paper ul,
+  .lettera-paper li {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.9;
+  }
+  .lettera-paper ul { padding-left: 1.2rem; margin-bottom: 0.9rem; }
+  .lettera-paper li { margin-bottom: 0.6rem; }
+
+  /* Segnaposto evidenziato in giallo per trovarlo facilmente */
+  .placeholder {
+    background: #FFFACD;
+    border-left: 3px solid var(--gold);
+    padding: 0.4rem 0.8rem;
+    border-radius: 0 8px 8px 0;
+    display: block;
+    font-style: normal;
+    font-size: 0.85rem;
+    color: #8A7040;
+    margin-bottom: 1rem;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .lettera-paper .firma {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 600; font-style: italic;
+    color: var(--rose-dark);
+    text-align: right; margin-top: 2rem;
+  }
+
+  /* Linee decorative tra paragrafi */
+  .lettera-divider {
+    border: none; border-top: 1px dashed var(--rose);
+    margin: 1.2rem 0; opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+  <div class="page-header">
+    <h1>💌 Solo per te</h1>
+    <p>Hai fatto bene ad aprirla fino in fondo</p>
+  </div>
+
+  <div class="lettera-paper">
+    <span class="saluto">Piccola mia,</span>
+
+    <h3 style="margin-top:0.4rem; margin-bottom:0.8rem;">Auguri per i tuoi 21 anni, amore mio! ❤️</h3>
+
+    <p>Oggi compi <strong>21 anni</strong>. Sì, lo so, fa impressione anche a me. Non potevo assolutamente non fermarmi un attimo per scriverti due righe, anche perché questo è un traguardo incredibile. Tra l'altro, diciamocelo, il <strong>21</strong> è visibilmente il miglior numero dell'universo... e non solo perché stai diventando una donna meravigliosa, ma soprattutto perché sono nato io il 21! Coincidenze? Io non credo. È chiaramente il destino che ha voluto ricordarti ogni giorno chi è la tua vera fortuna (cioè io, ovviamente).</p>
+
+    <p>Comunque, sappi che i 21 anni nel mondo aprono le porte a una serie di assurdità burocratiche senza precedenti. Se oggi fossimo all'estero, potresti festeggiare sfruttando i tuoi nuovi, importantissimi diritti da adulta:</p>
+
+    <ul style="margin-left:1rem; margin-bottom:0.8rem;">
+      <li><strong>A Mumbai (India):</strong> Festeggia, perché da oggi lo Stato indiano ti ritiene finalmente abbastanza matura da non affogare in un bicchiere di birra! Lì l'alcol è vietato fino ai 21 anni. Praticamente fino a ieri per loro eri una poppante, oggi sei una rispettabile bevitrice.</li>
+      <li><strong>In Bahrain:</strong> Se per caso ti avanzano due spiccioli, da oggi puoi legalmente registrare a tuo nome un’intera flotta di navi commerciali. Quindi, se il tuo sogno segreto era diventare un capitano corsaro o contrabbandare spezie nel Golfo Persico, sappi che la legge ora te lo permette.</li>
+      <li><strong>In Virginia (USA):</strong> Paese che vai, logica che trovi. Da oggi sei legalmente autorizzata a girare con una pistola vera e propria nascosta nella borsetta, però guai a te se provi a comprare una sigaretta elettronica, perché quella è considerata "roba pericolosa per i ragazzini".</li>
+      <li><strong>In Madagascar:</strong> Nelle zone più tradizionali, da oggi sei ufficialmente abbastanza "grande e saggia" da poter partecipare al Famadihana, il rito dove si tirano fuori le mummie degli antenati dalle tombe per farci un ballo insieme. Quindi, se i festeggiamenti classici dovessero sembrarti noiosi, abbiamo un'alternativa decisamente più movimentata e d'altri tempi.</li>
+    </ul>
+
+    <p>Insomma, il mondo è un posto assolutamente fuori di testa, e da oggi hai il passaporto ufficiale per essere totalmente matta anche tu.</p>
+
+    <p>Ma al di là dei pirati del Bahrain e dei balli con i defunti, la verità è un'altra. La verità è che la cosa più pazzesca di tutti questi anni non è stata scoprire le leggi bizzarre del mondo, ma guardare te. Vederti crescere giorno dopo giorno, un millimetro alla volta, è stato lo spettacolo più bello a cui potessi mai assistere.</p>
+
+    <p>Ti ho vista cambiare, evolverti, e fare passi da gigante sia nei tuoi pensieri che nel tuo modo di importi sul mondo. Sei passata dall'essere la ragazza di cui mi sono innamorato all'inizio, a diventare una donna incredibilmente determinata, fiera e intelligente. Hai una testa pazzesca e una maturità che spesso mi stupisce... anche se, ammettiamolo per onestà intellettuale, quando hai fame o quando le cose non vanno esattamente come avevi pianificato tu, tutta questa maturità svanisce nel nulla e l'età mentale ti crolla all'istante a 5 anni e mezzo. Ma a me piaci da morire proprio per questo contrasto continuo.</p>
+
+    <p>È incredibile come tu riesca ad affrontare le piccole e grandi sfide della vita con una grinta che mi lascia sempre senza fiato, per poi magari rischiare un infarto fulminante perché "oddio, ho perso il telefono!", cominciando a girare con il panico puro negli occhi, maledicendo i satelliti e la tecnologia... per poi scoprire che, cinque minuti prima, con una disinvoltura disarmante, lo avevi dato in custodia a me e ce l'ho io tranquillamente nella tasca dei pantaloni. Ormai è un classico della nostra commedia, e onestamente spero non cambierà mai.</p>
+
+    <p>Ogni giorno che passa ti vedo fare un passo in avanti: diventi più consapevole di chi sei, di quanto vali e di cosa meriti dalla vita. Eppure, nonostante tu stia crescendo così velocemente, la cosa che mi fa impazzire di te è che riesci a mantenere intatta quella dolcezza unica, quella purezza profonda e quel sorriso contagioso che ha il potere fisso e matematico di rincoglionirmi come se fosse il primo giorno in cui ti ho vista. Vedere come gestisci il tuo mondo, come ti prendi cura delle persone a cui vuoi bene, la lealtà che ci metti nei rapporti e il modo in cui insegui i tuoi obiettivi mi rende la persona più fiera del pianeta. Sei cresciuta tantissimo, amore mio, hai superato ostacoli e ti sei costruita la tua corazza, ma sei diventata una donna fantastica senza mai perdere la tua parte più vera, ironica e genuina. Stare al tuo fianco mentre diventi grande è un privilegio unico.</p>
+
+    <p>Il mio augurio per te, ora che hai 21 anni e che teoricamente per la legge del Bahrain potresti anche comandare una portaerei russa, è che tu possa esplorare questo mondo così folle senza mai perdere la tua luce, la tua ironia e soprattutto... che tu possa finalmente sviluppare un briciolo di quella pazienza che a te manca del tutto! Perché diciamoci la verità: qui l'unico con una pazienza infinita ed eroica sono io.</p>
+
+    <p>Ci vuole un autocontrollo da monaco buddista non solo per farti da portatelefono e cassaforte umana ufficiale, ma per sopravvivere a tutte le domande esistenziali e profondamente stupide che mi fai senza un briciolo di senso logico, per tutti i "CORNER!" che mi hai urlato contro o che mi hai mandato sotto forma di sticker molesti, e soprattutto per tutte le volte che, con una logica tutta tua che ancora devo decifrare, continui a chiamarmi "gay" nonostante stiamo felicemente insieme. Ti sopporto un sacco, sappilo, e questo è il mio più grande atto d'amore quotidiano. <em>(E per favore, non prenderla sul serio e non metterti a fare la finta offesa mentre leggi, sai benissimo che sto scherzando e che amo follemente ogni tua singola pazzia!)</em></p>
+
+    <p>Ti auguro di prenderti tutto ciò che desideri dalla vita, di non accontentarti mai e di non avere mai, per nessun motivo, paura di osare.</p>
+
+    <p>Ricordati che, ovunque deciderai di andare e qualsiasi cosa da matti deciderai di fare nel tuo futuro, io sarò sempre lì, esattamente un passo dietro di te, pronto a guardarti le spalle. Sarò la tua spalla sicuro quando sarai stanca, il tuo complice indiscusso nelle stupidaggini, la vittima preferita delle tue follie e il tuo fan numero uno, quello che urla più forte di tutti, in ogni singolo successo che otterrai.</p>
+
+    <p>Oggi si festeggia come meriti, mia splendida, esaurita e adorabile ventunenne. Buon compleanno, amore mio. Ti amo immensamente!</p>
+
+    <div class="firma">Per sempre tuo,<br>Mari&lt;3</div>
+  </div>
+
+  <a href="dashboard.html" class="btn-outline">← Torna alle sorprese</a>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  // Mostra una scrollbar elegante se il contenuto è più alto del viewport della card
+  (function(){
+    const paper = document.querySelector('.lettera-paper');
+    function update() {
+      if (paper.scrollHeight > paper.clientHeight) {
+        paper.style.overflowY = 'auto';
+        paper.style.scrollbarWidth = 'thin';
+      } else {
+        paper.style.overflowY = 'visible';
+        paper.style.scrollbarWidth = 'auto';
+      }
+    }
+    update();
+    window.addEventListener('resize', update);
+  })();
+</script>
+</body>
+</html>

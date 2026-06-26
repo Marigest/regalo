@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>✈️ Il Nostro Prossimo Volo</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { background: linear-gradient(160deg, #F0F5FF 0%, #FFF0F8 100%); }
+  .page { justify-content: flex-start; padding-top: 3rem; padding-bottom: 3rem; gap: 2rem; }
+
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700; color: var(--text);
+  }
+  .page-header p { color: var(--text-soft); font-style: italic; margin-top: 0.4rem; }
+
+  /* Card quiz */
+  .quiz-card {
+    background: var(--white);
+    border-radius: 28px;
+    padding: 2.5rem 2rem;
+    max-width: 560px; width: 100%;
+    box-shadow: 0 8px 32px var(--shadow);
+  }
+
+  /* Barra progresso */
+  .quiz-progress {
+    height: 6px; background: var(--pearl);
+    border-radius: 10px; margin-bottom: 2rem; overflow: hidden;
+  }
+  .quiz-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose-dark), var(--lilac-dark));
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+
+  .quiz-question {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; color: var(--text);
+    margin-bottom: 1.4rem; line-height: 1.45;
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 0.7rem; }
+  .quiz-option {
+    background: var(--pearl); border: 2px solid transparent;
+    border-radius: 14px; padding: 0.9rem 1.2rem;
+    cursor: pointer; font-size: 0.95rem; color: var(--text);
+    transition: all 0.2s; text-align: left; width: 100%;
+    font-family: 'Lato', sans-serif;
+  }
+  .quiz-option:hover  { border-color: var(--lilac); background: #F5F0FF; }
+  .quiz-option.selected { border-color: var(--lilac-dark); background: #EDE5FF; font-weight: 700; }
+
+  .quiz-nav {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-top: 1.5rem;
+  }
+  .quiz-count { font-size: 0.85rem; color: var(--text-soft); }
+  .quiz-btn {
+    background: linear-gradient(135deg, var(--rose-dark), var(--lilac-dark));
+    color: var(--white); border: none;
+    border-radius: 50px; padding: 0.75rem 1.8rem;
+    font-family: 'Lato', sans-serif; font-size: 0.95rem;
+    cursor: pointer; transition: transform 0.2s;
+  }
+  .quiz-btn:hover   { transform: scale(1.04); }
+  .quiz-btn:disabled { opacity: 0.35; cursor: default; transform: none; }
+
+  /* Schermata finale quiz */
+  .quiz-done { text-align: center; padding: 1rem 0; }
+  .quiz-done .big-emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+  .quiz-done h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; color: var(--text); margin-bottom: 0.6rem;
+  }
+  .quiz-done p { color: var(--text-soft); font-size: 0.95rem; line-height: 1.7; }
+  .quiz-done .answers-preview {
+    background: var(--pearl); border-radius: 16px;
+    padding: 1.2rem 1.4rem; margin-top: 1.2rem;
+    text-align: left;
+    max-height: 240px; overflow-y: auto;
+  }
+  .quiz-done .answer-row { margin-bottom: 0.8rem; }
+  .quiz-done .answer-row .q { font-size: 0.78rem; color: var(--text-soft); margin-bottom: 0.15rem; }
+  .quiz-done .answer-row .a { font-size: 0.88rem; color: var(--text); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+  <div class="page-header">
+    <h1>✈️ Il Nostro Prossimo Volo</h1>
+    <p>Rispondi e costruiamo insieme il viaggio dei tuoi sogni!</p>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-progress"><div class="quiz-progress-bar" id="quiz-bar"></div></div>
+    <div id="quiz-content"></div>
+  </div>
+
+  <div style="max-width:560px; width:100%; margin-top:0.8rem; display:flex; gap:0.6rem; align-items:center;">
+    <button id="reset-quiz" style="background:transparent;border:1px solid var(--pearl);color:var(--text);padding:0.5rem 0.9rem;border-radius:10px;cursor:pointer">Reset risposte</button>
+  </div>
+
+  <a href="dashboard.html" class="btn-outline">← Torna alle sorprese</a>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  // Domande del quiz: 30 domande interamente sul tema del viaggio
+  const quizData = [
+    { type: 'mc', question: 'Preferisci vacanze al mare o in montagna?', options: ['Mare','Montagna','Ambedue','Nessuno'] },
+    { type: 'mc', question: 'Quale mezzo preferisci per viaggiare?', options: ['Aereo','Treno','Auto','Nave'] },
+    { type: 'mc', question: 'Ti piace viaggiare pianificando tutto o improvvisando?', options: ['Pianificato','Improvvisato','Un po\'e un po\'','Dipende dalla meta'] },
+    { type: 'text', question: 'Descrivi la tua destinazione da sogno.' },
+    { type: 'mc', question: 'Preferisci viaggi lunghi o brevi weekend?', options: ['Lunghi','Brevi','Entrambi','Dipende'] },
+    { type: 'text', question: 'Racconta il miglior ricordo di viaggio che hai.' },
+    { type: 'mc', question: 'Cosa ti attira di più in una città nuova?', options: ['Cibo','Architettura','Vita notturna','Musei e cultura'] },
+    { type: 'mc', question: 'Quando viaggi, preferisci soggiornare in:', options: ['Hotel','B&B','Appartamento','Ostelli'] },
+    { type: 'text', question: 'Quali tre oggetti non devono mai mancare nella tua valigia?' },
+    { type: 'mc', question: 'Quanto conta il budget nella scelta della meta?', options: ['Molto','Abbastanza','Poco','Per niente'] },
+    { type: 'mc', question: 'Preferisci esplorare a piedi o con tour organizzati?', options: ['A piedi','Tour organizzati','Noleggiare auto','Entrambi'] },
+    { type: 'text', question: 'Hai una lista di posti da vedere (bucket list)? Dimmi uno.' },
+    { type: 'mc', question: 'Ti piace provare il cibo locale?', options: ['Sempre','Solo se interessante','Raramente','Mai'] },
+    { type: 'text', question: 'Qual è il piatto locale più memorabile che hai mangiato?' },
+    { type: 'mc', question: 'Preferisci spiagge affollate o tranquille?', options: ['Affollate','Tranquille','Mix','Non mi interessano le spiagge'] },
+    { type: 'mc', question: 'Durante il viaggio, cosa preferisci come ritmo?', options: ['Full-immersion','Relax totale','Giornate miste','Dipende'] },
+    { type: 'text', question: 'Qual è la tua routine mattutina in vacanza?' },
+    { type: 'mc', question: 'Ti piace documentare i viaggi con foto o video?', options: ['Foto','Video','Entrambi','Nessuno'] },
+    { type: 'text', question: 'Hai un rituale prima di partire? Raccontalo.' },
+    { type: 'mc', question: 'Preferisci mete calde o fredde?', options: ['Calde','Fredde','Mitigate','Dipende'] },
+    { type: 'text', question: 'Qual è la tua città europea preferita e perché?' },
+    { type: 'mc', question: 'Ti piace pianificare i ristoranti in anticipo?', options: ['Sì','No','Qualche volta','Solo per occasioni speciali'] },
+    { type: 'text', question: 'Quale attività avventurosa ti piacerebbe provare?' },
+    { type: 'mc', question: 'Quanto conta il comfort durante il viaggio?', options: ['Molto','Abbastanza','Poco','Per niente'] },
+    { type: 'text', question: 'Hai mai avuto un imprevisto durante un viaggio? Raccontalo.' },
+    { type: 'mc', question: 'Preferisci visitare luoghi famosi o nascondigli locali?', options: ['Famosi','Locali','Entrambi','Non ho preferenze'] },
+    { type: 'text', question: 'Qual è il miglior souvenir che hai portato a casa?' },
+    { type: 'mc', question: 'Ti senti più comodo con itinerario dettagliato o spontaneità?', options: ['Itinerario dettagliato','Spontaneità','Semi-pianificato','Dipende'] },
+    { type: 'text', question: 'Descrivi il viaggio perfetto di 7 giorni.' },
+    { type: 'mc', question: 'Se potessi scegliere ora, partirai per una meta europea o esotica?', options: ['Europea','Esotica','Entrambe','Resto a casa'] }
+  ];
+
+  let currentQ = 0;
+  const answers = [];
+
+  // Carica risposte già date (se ha riaperto la pagina)
+  const saved = JSON.parse(localStorage.getItem('quiz_viaggio') || 'null');
+  if (saved && saved.done) {
+    currentQ = quizData.length; // salta direttamente al risultato
+    saved.answers.forEach((a, i) => answers[i] = a);
+  }
+
+  function render() {
+    const total = quizData.length;
+    document.getElementById('quiz-bar').style.width = (currentQ / total * 100) + '%';
+
+    if (currentQ >= total) { renderDone(); return; }
+
+    const q = quizData[currentQ];
+    if (q.type === 'mc') {
+      document.getElementById('quiz-content').innerHTML = `
+        <div class="quiz-question">${q.question}</div>
+        <div class="quiz-options">
+          ${q.options.map((opt, i) => `
+            <button class="quiz-option${answers[currentQ]?.idx === i ? ' selected' : ''}"
+                    onclick="select(${i})">${opt}</button>
+          `).join('')}
+        </div>
+        <div class="quiz-nav">
+          <span class="quiz-count">Domanda ${currentQ + 1} di ${total}</span>
+          <button class="quiz-btn" id="q-next" ${answers[currentQ] ? '' : 'disabled'} onclick="next()">Avanti →</button>
+        </div>
+      `;
+    } else {
+      document.getElementById('quiz-content').innerHTML = `
+        <div class="quiz-question">${q.question}</div>
+        <div>
+          <textarea id="open-answer" rows="4" style="width:100%; padding:0.8rem; border-radius:12px; border:1px solid var(--pearl); font-family:Lato, sans-serif;">${answers[currentQ]?.text || ''}</textarea>
+        </div>
+        <div class="quiz-nav">
+          <span class="quiz-count">Domanda ${currentQ + 1} di ${total}</span>
+          <button class="quiz-btn" id="q-next" onclick="next()">Avanti →</button>
+        </div>
+      `;
+      // abilita/disabilita next in base al contenuto
+      const ta = document.getElementById('open-answer');
+      ta.addEventListener('input', () => { document.getElementById('q-next').disabled = ta.value.trim().length === 0; });
+      document.getElementById('q-next').disabled = !answers[currentQ];
+    }
+  }
+
+  function select(idx) {
+    const q = quizData[currentQ];
+    answers[currentQ] = { question: q.question, answer: q.options[idx], idx };
+    // salva parziale
+    localStorage.setItem('quiz_viaggio_partial', JSON.stringify(answers));
+    render();
+  }
+
+  function next() {
+    const q = quizData[currentQ];
+    if (q.type === 'text') {
+      const val = document.getElementById('open-answer').value.trim();
+      answers[currentQ] = { question: q.question, answer: val };
+    }
+    currentQ++;
+    if (currentQ >= quizData.length) {
+      // Salva tutto in localStorage
+      localStorage.setItem('quiz_viaggio', JSON.stringify({ done: true, timestamp: new Date().toLocaleString('it-IT'), answers }));
+      localStorage.removeItem('quiz_viaggio_partial');
+    } else {
+      localStorage.setItem('quiz_viaggio_partial', JSON.stringify(answers));
+    }
+    render();
+  }
+
+  function renderDone() {
+    document.getElementById('quiz-bar').style.width = '100%';
+    const rows = answers.map((a,i) => `
+      <div class="answer-row">
+        <div class="q">${i+1}. ${a.question}</div>
+        <div class="a">${a.answer || ''}</div>
+      </div>`).join('');
+
+    document.getElementById('quiz-content').innerHTML = `
+      <div class="quiz-done">
+        <div class="big-emoji">🎉</div>
+        <h3>Quiz completato!</h3>
+        <p>Perfetto amore — ho salvato tutto.<br>
+           Puoi recuperare le risposte in qualsiasi momento.</p>
+        <div class="answers-preview">${rows}</div>
+      </div>
+    `;
+  }
+
+  render();
+
+  // Funzione utile per recuperare le risposte via console:
+  // JSON.parse(localStorage.getItem('quiz_viaggio'))
+
+  // Pulsante per resettare le risposte salvate
+  document.getElementById('reset-quiz').addEventListener('click', () => {
+    if (!confirm('Resettare le risposte del quiz? Questa azione non è reversibile.')) return;
+    localStorage.removeItem('quiz_viaggio');
+    localStorage.removeItem('quiz_viaggio_partial');
+    // svuota array locali e riporta al primo quesito
+    for (let i = 0; i < quizData.length; i++) answers[i] = undefined;
+    currentQ = 0;
+    alert('Risposte resettate. La pagina verrà ricaricata.');
+    location.reload();
+  });
+</script>
+</body>
+</html>

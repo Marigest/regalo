@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🎁 Il tuo vero regalo</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  :root { --bg: linear-gradient(180deg,#FFF9FB,#FFF0F8); }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); font-family: Lato, system-ui, sans-serif; }
+  .hero { width:100%; max-width:1100px; padding:2rem; display:flex; gap:2rem; align-items:center; justify-content:center; flex-direction:column; }
+  .photo-wrap { width:100%; border-radius:18px; overflow:hidden; box-shadow:0 30px 80px rgba(120,60,130,0.18); }
+  .photo-large { width:100%; height: min(70vh, 780px); object-fit:contain; display:block; background-color:#000; }
+  .caption { margin-top:1.2rem; text-align:center; }
+  .caption h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem,5vw,3rem); margin:0; color: #4b2b5e; }
+  .caption p { margin:0.6rem 0 0; color:#6d526f; font-size:1.05rem; }
+  .pointing { font-size:2.6rem; margin-top:0.6rem; }
+  .actions { margin-top:1.2rem; display:flex; gap:0.8rem; align-items:center; }
+  .btn-outline { background:transparent; border:1px solid #e6d7ec; padding:0.7rem 1rem; border-radius:12px; color:#5c3b5e; text-decoration:none; }
+  .btn-primary { background:linear-gradient(90deg,#ff9ac8,#cfa0ff); color:white; padding:0.8rem 1.2rem; border-radius:12px; text-decoration:none; }
+  @media (min-width:900px){ .hero{flex-direction:column;} }
+  /* Emoji lateral positioning for small screens */
+  @media (max-width:760px){
+    .pointing { font-size:2rem; }
+    .photo-large { height: 55vh; }
+  }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div style="display:flex; width:100%; gap:1rem; align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:0.8rem; align-items:center;">
+        <div class="pointing">👉</div>
+        <div class="pointing">👉</div>
+      </div>
+
+      <div class="photo-wrap" style="flex:1; display:flex; align-items:center; justify-content:center;">
+        <!-- Sostituisci images/gay4.jpeg con la tua foto reale -->
+        <img loading="lazy" class="photo-large" src="images/gay7.jpeg" alt="La foto del regalo" 
+             onerror="this.onerror=null; this.src='images/gay1.jpeg';" 
+             onload="this.classList.add('loaded')" />
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.8rem; align-items:center;">
+        <div class="pointing">👈</div>
+        <div class="pointing">👈</div>
+      </div>
+    </div>
+    <div class="caption">
+      <h1>Sono io il tuo regalo</h1>
+      <p>Apri gli occhi — questo è per te, ora e sempre.</p>
+      <div class="actions" style="justify-content:center; margin-top:1rem;">
+        <a href="dashboard.html" class="btn-outline">← Torna alle sorprese</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

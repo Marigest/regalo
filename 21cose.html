@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>✨ 21 Cose di Te</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { background: linear-gradient(160deg, #FFF0F5 0%, #F5F0FF 100%); }
+  .page { justify-content: flex-start; padding-top: 3rem; padding-bottom: 3rem; gap: 2rem; }
+
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700; color: var(--text);
+  }
+  .page-header h1 span { color: var(--lilac-dark); }
+  .page-header p { color: var(--text-soft); font-style: italic; margin-top: 0.4rem; }
+
+  /* Griglia tasselli */
+  .tiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.9rem;
+    max-width: 700px; width: 100%;
+  }
+
+  /* Ogni tassello è una card che si gira */
+  .tile {
+    aspect-ratio: 1;
+    perspective: 700px;
+    cursor: pointer;
+  }
+  .tile-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
+  }
+  .tile.flipped .tile-inner { transform: rotateY(180deg); }
+
+  .tile-front, .tile-back {
+    position: absolute; inset: 0;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    padding: 0.4rem;
+  }
+  .tile-front {
+    background: linear-gradient(135deg, var(--rose), var(--lilac));
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--white);
+    box-shadow: 0 4px 14px var(--shadow);
+  }
+  .tile-back {
+    background: var(--white);
+    transform: rotateY(180deg);
+    font-size: 0.68rem; color: var(--text);
+    text-align: center; font-family: 'Lato', sans-serif;
+    line-height: 1.35;
+    box-shadow: 0 4px 14px var(--shadow);
+    border: 2px solid var(--lilac);
+  }
+
+  .counter {
+    font-size: 0.88rem; color: var(--text-soft);
+    font-style: italic;
+  }
+  .counter span { color: var(--lilac-dark); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+  <div class="page-header">
+    <h1>✨ 21 Cose di <span>Te</span></h1>
+    <p>Clicca su ogni numero per scoprire un motivo per cui ti amo</p>
+  </div>
+
+  <div class="photo-grid" id="photo-grid">
+    <img src="images/gay5.jpeg" alt="Foto 1" class="grid-photo">
+    <img src="images/gay2.jpeg" alt="Foto 2" class="grid-photo">
+    <img src="images/gay6.jpeg" alt="Foto 3" class="grid-photo">
+  </div>
+
+  <p class="counter">Scoperte: <span id="count">0</span> / 21</p>
+
+  <div class="tiles-grid" id="tiles-container"></div>
+
+  <a href="dashboard.html" class="btn-outline">← Torna alle sorprese</a>
+</div>
+
+<script src="particles.js"></script>
+<script>
+  // ⚠️ MODIFICA QUI i 21 testi con le tue parole vere
+  const cose = [
+    "Il suono della tua risata più sincera, quella che ti esplode all'improvviso e che ha il potere di svoltare anche la mia giornata più storta.",
+    "La scintilla che ti accende lo sguardo quando parli di qualcosa che ti appassiona, perché ti rende ancora più bella di quanto già tu non sia.",
+    "La tua adorabile caparbietà, che difendi con così tanto orgoglio che alla fine mi ritrovo ad amarti ancora di più (anche quando hai palesemente ragione tu).",
+    "Il dono raro che hai di far sentire speciale chiunque ti sia vicino, semplicemente donando un po' del tuo tempo e della tua attenzione.",
+    "Il modo unico in cui pronunci il mio nome, con quella dolcezza che nessun altro al mondo potrà mai replicare.",
+    "La tua sensibilità nel notare i piccoli dettagli, quei gesti e quelle sfumature che gli altri ignorano ma che per te fanno la differenza.",
+    "Come ti perdi completamente dentro una canzone che ami, isolandoti dal resto del mondo e lasciandoti trasportare dalle emozioni.",
+    "Il tuo cuore così grande e pulito, capace di andare oltre gli errori e di insegnarmi, giorno dopo giorno, come si ama davvero.",
+    "Il modo in cui cerchi il mio abbraccio quando hai sonno, stringendoti a me come se fossi il tuo posto sicuro nel mondo e l'unico posto in cui vorresti essere.",
+    "La tua capacità di leggermi dentro al primo sguardo, capendo esattamente come sto prima ancora che io riesca a darti una spiegazione.",
+    "La tua forza d'animo così profonda e silenziosa, che non hai bisogno di sbandierare perché si vede in tutto ciò che affronti.",
+    "Quel tuo entusiasmo così puro e travolgente che ti fa parlare a raffica di una cosa nuova, riempiendo la stanza di energia.",
+    "La delicatezza d'animo che mostri verso chi è più vulnerabile, una bontà d'altri tempi che ogni volta mi riempie d'orgoglio.",
+    "Il modo incrollabile in cui ti stringi a chi ami nei momenti bui, diventando l'ancora e il porto sicuro di chiunque abbia la fortuna di averti accanto.",
+    "La nostra complicità unica, fatta di sguardi e battute tutte nostre, un linguaggio segreto che capiamo soltanto io e te.",
+    "Il valore immenso che dai alla mia presenza, una fiducia così pulita che custodisco come il tesoro più prezioso che ho.",
+    "La tua determinazione d'acciaio, quella che porti avanti in silenzio, senza fare rumore, ma che ti permette di superare qualsiasi barriera.",
+    "Come riesci a colorare e a dare un senso a tutto ciò che mi circonda, semplicemente stando ferma lì, accanto a me.",
+    "Il fatto che tu riesca ancora a lasciarmi senza fiato come il primo giorno, dimostrandomi che l'amore vero non si annoia mai.",
+    "Come hai preso la mia vita e l'hai resa infinitamente migliore, insegnandomi a guardare il mondo attraverso i tuoi occhi.",
+    "Semplicemente la meraviglia che sei, in ogni tua sfumatura, esattamente così come sei in questo preciso istante. 💕"
+  ];
+
+  let flippedCount = 0;
+  const savedFlipped = new Set(JSON.parse(localStorage.getItem('flipped_tiles') || '[]'));
+
+  const grid = document.getElementById('tiles-container');
+  const counter = document.getElementById('count');
+
+  // Inserisci le foto direttamente nel markup sopra; rimosso caricamento file/upload per semplicità.
+
+  cose.forEach((text, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile' + (savedFlipped.has(i) ? ' flipped' : '');
+    tile.innerHTML = `
+      <div class="tile-inner">
+        <div class="tile-front">${i + 1}</div>
+        <div class="tile-back">${text}</div>
+      </div>`;
+    tile.addEventListener('click', () => {
+      tile.classList.toggle('flipped');
+      savedFlipped[tile.classList.contains('flipped') ? 'add' : 'delete'](i);
+      localStorage.setItem('flipped_tiles', JSON.stringify([...savedFlipped]));
+      counter.textContent = savedFlipped.size;
+    });
+    grid.appendChild(tile);
+  });
+
+  counter.textContent = savedFlipped.size;
+</script>
+</body>
+</html>
